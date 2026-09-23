@@ -120,3 +120,4 @@ jobs:
           path: ~/AnyKernel3/Bouquet-Kernel-ci-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}.zip
           if-no-files-found: error
           archive: false
+
