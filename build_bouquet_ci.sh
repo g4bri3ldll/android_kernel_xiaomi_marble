@@ -119,12 +119,14 @@ if ${with_ksu}; then
 		cp ${SUSFS_REPO}/kernel_patches/include/linux/* ${KDIR}/include/linux/
 
 		git apply ${SUSFS_REPO}/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch || exit 1
-		sed -e 's|a/kernel/|a/drivers/kernelsu/kernel/|g' \
-		    -e 's|b/kernel/|b/drivers/kernelsu/kernel/|g' \
-		    ${SUSFS_REPO}/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch | git apply || exit 1
+
+		if [ -f "${KERNELSU_REPO}/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch" ]; then
+			git apply ${KERNELSU_REPO}/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch || true
+		elif [ -d "${KERNELSU_REPO}/kernel/susfs" ]; then
+			echo "SUSFS já integrado no KernelSU Next"
+		fi
 	fi
 fi
-
 $no_mkclean || make $make_flags KCFLAGS="$make_kcflags" KBUILD_LDFLAGS="$make_kbuild_ldflags" mrproper
 make $make_flags KCFLAGS="$make_kcflags" KBUILD_LDFLAGS="$make_kbuild_ldflags" "$use_defconfig"
 
