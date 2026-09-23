@@ -75,24 +75,12 @@ jobs:
           key: ccache-bouquet-ci-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             ccache-bouquet-ci-${{ runner.os }}-
-      - name: Build kernel Image & modules
-        run: |
-          cd $GITHUB_WORKSPACE
-          ./build_bouquet_ci.sh
-          cp -r ~/Bouquet_marble_out/* ~/dist/
-      - name: Build kernel Image with KernelSU Next
-        run: |
-          cd ~
-          rm -rf KernelSU
-          git clone https://github.com/KernelSU-Next/KernelSU-Next.git KernelSU
-          cd $GITHUB_WORKSPACE
-          ./build_bouquet_ci.sh --noclean --ksu -- Image
-          cp ~/Bouquet_marble_out/Image_ksu* ~/dist/
       - name: Build kernel Image with KernelSU Next & susfs
         continue-on-error: true
         run: |
           cd ~
-          rm -rf susfs4ksu
+          rm -rf KernelSU susfs4ksu
+          git clone https://github.com/KernelSU-Next/KernelSU-Next.git KernelSU
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 --depth=1
           cd $GITHUB_WORKSPACE
           ./build_bouquet_ci.sh --susfs -- Image
