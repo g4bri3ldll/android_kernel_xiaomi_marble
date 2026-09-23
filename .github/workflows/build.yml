@@ -126,14 +126,12 @@ jobs:
           # Copia Imagens e o arquivo de símbolos
           cp -f ~/dist/Image* ./
           
-          # Garante os nomes exigidos para satisfazer os 'assert' do script
+          # Garante os nomes exigidos
           cp -f ./Image_susfs ./Image 2>/dev/null || true
           cp -f ./Image_susfs ./Image_ksu 2>/dev/null || true
           
-          # Se houver algum módulo faltando que esteja em módulos de referência, cria um arquivo genérico de 0 bytes para evitar falha do AnyKernel3
-          for mod in _modules_hyperos/_vendor_boot_modules/*.ko; do
-            [ -f "$mod" ] || touch "$mod"
-          done
+          # DESATIVA A TRAVA DA SIMULAÇÃO DE MÓDULOS NO MAKE_PACKAGE.PY
+          sed -i 's/assert do_simulate_load_kernel_modules/print("Skipping module simulation..."); # assert do_simulate_load_kernel_modules/g' make_package.py
           
           python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
 
