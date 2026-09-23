@@ -120,6 +120,7 @@ jobs:
           cp -f ~/dist/vendor_boot_modules/* ./_modules_hyperos/_vendor_boot_modules/ 2>/dev/null || true
           cp -f ~/dist/vendor_dlkm_modules/* ./_modules_hyperos/_vendor_dlkm_modules/ 2>/dev/null || true
           cp -f ~/dist/Image* ./
+          cp -f ./Image_susfs ./Image
           
           python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
       - name: Upload artifacts
