@@ -145,7 +145,7 @@ fi
 
 t_start=$(date +"%s")
 
-make $make_flags KCFLAGS="$make_kcflags" KBUILD_LDFLAGS="$make_kbuild_ldflags" -j$(nproc --all) $make_target
+make $make_flags KCFLAGS="$make_kcflags" KBUILD_LDFLAGS="$make_kbuild_ldflags" -j$(nproc --all) Image dtbs modules $make_target
 
 if [ $? != 0 ]; then
 	echo -e "$red << Failed to compile, fix the errors first >>$white"
