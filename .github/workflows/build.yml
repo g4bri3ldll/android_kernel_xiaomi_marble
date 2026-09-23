@@ -84,21 +84,41 @@ jobs:
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android12-5.10 --depth=1
           cd $GITHUB_WORKSPACE
           ./build_bouquet_ci.sh --susfs -- Image
+          
+          # Copia a imagem do kernel
           cp ~/Bouquet_marble_out/Image_susfs* ~/dist/
+          
+          # Cria as pastas necessárias em ~/dist
+          mkdir -p ~/dist/devicetree
+          mkdir -p ~/dist/alt_kernel_modules
+          mkdir -p ~/dist/vendor_boot_modules
+          mkdir -p ~/dist/vendor_dlkm_modules
+          
+          # Copia os ficheiros de devicetree gerados
+          find ~/Bouquet_marble_out/ -name "ukee.dtb" -exec cp {} ~/dist/devicetree/ \; 2>/dev/null || true
+          find ~/Bouquet_marble_out/ -name "dtbo.img" -exec cp {} ~/dist/devicetree/ \; 2>/dev/null || true
+          
+          # Copia módulos caso tenham sido gerados na pasta out
+          find ~/Bouquet_marble_out/ -name "*.ko" -exec cp {} ~/dist/alt_kernel_modules/ \; 2>/dev/null || true
+
       - name: Show ccache stats
         run: ccache --show-stats
+
       - name: Package AK3
         run: |
           cd ~
           git clone https://github.com/Pzqqt/AnyKernel3.git -b Marble-Bouquet --depth=1
           cd AnyKernel3
           
-          rm ./Image*
-          cp -f ~/dist/devicetree/ukee.dtb   ./_dtb/dtb
-          cp -f ~/dist/devicetree/dtbo.img   ./_dtb/dtbo.img
-          cp -f ~/dist/alt_kernel_modules/*  ./_modules_hyperos/_alt/
-          cp -f ~/dist/vendor_boot_modules/* ./_modules_hyperos/_vendor_boot_modules/
-          cp -f ~/dist/vendor_dlkm_modules/* ./_modules_hyperos/_vendor_dlkm_modules/
+          rm -f ./Image*
+          
+          # Copia ficheiros de forma segura (sem falhar caso a pasta esteja vazia)
+          [ -f ~/dist/devicetree/ukee.dtb ] && cp -f ~/dist/devicetree/ukee.dtb ./_dtb/dtb
+          [ -f ~/dist/devicetree/dtbo.img ] && cp -f ~/dist/devicetree/dtbo.img ./_dtb/dtbo.img
+          
+          cp -f ~/dist/alt_kernel_modules/*  ./_modules_hyperos/_alt/ 2>/dev/null || true
+          cp -f ~/dist/vendor_boot_modules/* ./_modules_hyperos/_vendor_boot_modules/ 2>/dev/null || true
+          cp -f ~/dist/vendor_dlkm_modules/* ./_modules_hyperos/_vendor_dlkm_modules/ 2>/dev/null || true
           cp -f ~/dist/Image* ./
           
           python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
