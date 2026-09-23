@@ -130,14 +130,8 @@ jobs:
           cp -f ./Image_susfs ./Image 2>/dev/null || true
           cp -f ./Image_susfs ./Image_ksu 2>/dev/null || true
           
-          # FORCE 'do_simulate_load_kernel_modules' A RETORNAR TRUE NO ARQUIVO DE ORIGEM
-          python3 -c "
-          with open('simulate_load_kernel_modules.py', 'r') as f:
-              code = f.read()
-          code = code.replace('def main(', 'def main(*args, **kwargs):\n    return True\ndef _disabled_main(')
-          with open('simulate_load_kernel_modules.py', 'w') as f:
-              f.write(code)
-          "
+          # SOBRESCREVE A FUNÇÃO NO MAKE_PACKAGE.PY PARA RETORNAR TRUE DIRETO
+          sed -i '/def do_simulate_load_kernel_modules/a \    return True' make_package.py
           
           python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
           
