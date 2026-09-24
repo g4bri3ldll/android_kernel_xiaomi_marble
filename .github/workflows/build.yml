@@ -106,34 +106,13 @@ jobs:
       - name: Show ccache stats
         run: ccache --show-stats
 
-      - name: Package AK3
-        run: |
-          cd ~
-          git clone https://github.com/Pzqqt/AnyKernel3.git -b Marble-Bouquet --depth=1
-          cd AnyKernel3
-          
-          rm -f ./Image*
-
-          [ -f ~/dist/devicetree/ukee.dtb ] && cp -f ~/dist/devicetree/ukee.dtb ./_dtb/dtb
-          [ -f ~/dist/devicetree/dtbo.img ] && cp -f ~/dist/devicetree/dtbo.img ./_dtb/dtbo.img
-
-          cp -f ~/dist/alt_kernel_modules/*  ./_modules_hyperos/_alt/ 2>/dev/null || true
-          cp -f ~/dist/vendor_boot_modules/* ./_modules_hyperos/_vendor_boot_modules/ 2>/dev/null || true
-          cp -f ~/dist/vendor_dlkm_modules/* ./_modules_hyperos/_vendor_dlkm_modules/ 2>/dev/null || true
-
-          cp -f ~/dist/Image* ./
-
-          cp -f ./Image_susfs ./Image 2>/dev/null || true
-          cp -f ./Image_susfs ./Image_ksu 2>/dev/null || true
-
-          sed -i 's/assert do_simulate_load_kernel_modules.*/print("Bypassing module simulation check...")/g' make_package.py
-          
-          python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
-          
-      - name: Upload artifacts
+      - name: Upload kernel artifacts
         uses: actions/upload-artifact@v7
         with:
-          path: ~/AnyKernel3/Bouquet-Kernel-ci-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}.zip
+          name: Kernel-Bouquet-${{ env.BUILD_DATE }}-${{ env.SHORT_SHA }}
+          path: |
+            ~/dist/Image*
+            ~/dist/devicetree/*.dtb
+            ~/dist/devicetree/*.img
           if-no-files-found: error
-          archive: false
 
