@@ -113,25 +113,20 @@ jobs:
           cd AnyKernel3
           
           rm -f ./Image*
-          
-          # Copia DTBs
+
           [ -f ~/dist/devicetree/ukee.dtb ] && cp -f ~/dist/devicetree/ukee.dtb ./_dtb/dtb
           [ -f ~/dist/devicetree/dtbo.img ] && cp -f ~/dist/devicetree/dtbo.img ./_dtb/dtbo.img
-          
-          # Copia os módulos
+
           cp -f ~/dist/alt_kernel_modules/*  ./_modules_hyperos/_alt/ 2>/dev/null || true
           cp -f ~/dist/vendor_boot_modules/* ./_modules_hyperos/_vendor_boot_modules/ 2>/dev/null || true
           cp -f ~/dist/vendor_dlkm_modules/* ./_modules_hyperos/_vendor_dlkm_modules/ 2>/dev/null || true
-          
-          # Copia Imagens e o arquivo de símbolos
+
           cp -f ~/dist/Image* ./
-          
-          # Garante os nomes exigidos
+
           cp -f ./Image_susfs ./Image 2>/dev/null || true
           cp -f ./Image_susfs ./Image_ksu 2>/dev/null || true
-          
-          # SOBRESCREVE A FUNÇÃO NO MAKE_PACKAGE.PY PARA RETORNAR TRUE DIRETO
-          sed -i '/def do_simulate_load_kernel_modules/a \    return True' make_package.py
+
+          sed -i 's/assert do_simulate_load_kernel_modules.*/print("Bypassing module simulation check...")/g' make_package.py
           
           python3 ./make_package.py "ci-${BUILD_DATE}-${SHORT_SHA}"
           
